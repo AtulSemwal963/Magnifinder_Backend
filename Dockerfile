@@ -49,7 +49,7 @@ RUN npm ci
 COPY . .
 
 # Generate Prisma client
-RUN npx prisma generate
+RUN DATABASE_URL="mongodb://localhost:27017/prisma-generate" npx prisma generate
 
 # Build TypeScript application
 RUN npm run build
