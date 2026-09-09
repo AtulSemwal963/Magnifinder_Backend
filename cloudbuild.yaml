@@ -5,10 +5,10 @@ substitutions:
   _DEPLOY_REGION: europe-west1
   _SERVICE_NAME: magnifinder-backend-git
   _TRIGGER_ID: b2209a95-24ff-4d84-8283-6d6681fdb5af
-  REPO_NAME: wellnesswizard-org-magnifinder_backend
+  _REPO_NAME: wellnesswizard-org-magnifinder_backend
   _FRONTEND_URL: https://magnifinder.vercel.app
   _ALLOWED_ORIGINS: https://magnifinder.vercel.app
-  _GOOGLE_OAUTH_REDIRECT_URI: https://REPLACE_AFTER_FIRST_DEPLOYMENT/api/v1/identity/google/callback
+  _GOOGLE_OAUTH_REDIRECT_URI: https://magnifinder-backend-git-xyz-ew.a.run.app/api/v1/identity/google/callback
 
 steps:
   - name: gcr.io/cloud-builders/docker
