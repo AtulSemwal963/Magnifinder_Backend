@@ -1,0 +1,15 @@
+model Search {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  chatId String @db.ObjectId
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  productDescription String
+  campaignTarget     String?
+  status             String  @default("pending")
+
+  leads Lead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

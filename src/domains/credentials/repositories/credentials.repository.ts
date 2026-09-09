@@ -1,0 +1,154 @@
+
+import { prisma } from "../../../lib/prisma.js";
+
+import type {
+  ProviderCredential,
+} from "../../../generated/prisma/client.js";
+
+export interface CreateCredentialData {
+  userId: string;
+  provider: string;
+  modelName?: string;
+  encryptedApiKey: string;
+  keyVersion: number;
+}
+
+export interface UpdateCredentialData {
+  provider?: string;
+  modelName?: string;
+  encryptedApiKey?: string;
+  keyVersion?: number;
+}
+
+export class CredentialsRepository {
+  /**
+   * Find every credential belonging to a specific user.
+   *
+   * The repository returns the database representation.
+   * It does not decrypt API keys and does not expose
+   * any presentation-specific fields such as `hasApiKey`.
+   */
+  async findByUserId(
+    userId: string
+  ): Promise<ProviderCredential[]> {
+    return prisma.providerCredential.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  }
+
+  /**
+   * Find one credential belonging to a specific user
+   * and provider.
+   *
+   * Ownership is enforced through the compound unique
+   * constraint:
+   *
+   * userId + provider
+   */
+  async findByUserIdAndProvider(
+    userId: string,
+    provider: string
+  ): Promise<ProviderCredential | null> {
+    return prisma.providerCredential.findUnique({
+      where: {
+        userId_provider: {
+          userId,
+          provider,
+        },
+      },
+    });
+  }
+
+  /**
+   * Create a provider credential.
+   *
+   * The API key MUST already be encrypted before this
+   * method is called.
+   *
+   * Encryption/decryption does not belong in the repository.
+   */
+  async create(
+    data: CreateCredentialData
+  ): Promise<ProviderCredential> {
+    return prisma.providerCredential.create({
+      data: {
+        userId: data.userId,
+        provider: data.provider,
+
+        ...(data.modelName !== undefined && {
+          modelName: data.modelName,
+        }),
+
+        encryptedApiKey: data.encryptedApiKey,
+        keyVersion: data.keyVersion,
+      },
+    });
+  }
+
+  /**
+   * Update an existing provider credential.
+   *
+   * The caller is responsible for encrypting a new API key
+   * before passing `encryptedApiKey` here.
+   *
+   * This method does not decrypt or otherwise inspect secrets.
+   */
+  async updateByUserIdAndProvider(
+    userId: string,
+    provider: string,
+    data: UpdateCredentialData
+  ): Promise<ProviderCredential> {
+    return prisma.providerCredential.update({
+      where: {
+        userId_provider: {
+          userId,
+          provider,
+        },
+      },
+
+      data: {
+        ...(data.provider !== undefined && {
+          provider: data.provider,
+        }),
+
+        ...(data.modelName !== undefined && {
+          modelName: data.modelName,
+        }),
+
+        ...(data.encryptedApiKey !== undefined && {
+          encryptedApiKey: data.encryptedApiKey,
+        }),
+
+        ...(data.keyVersion !== undefined && {
+          keyVersion: data.keyVersion,
+        }),
+      },
+    });
+  }
+
+  /**
+   * Delete a provider credential belonging to a user.
+   */
+  async deleteByUserIdAndProvider(
+    userId: string,
+    provider: string
+  ): Promise<ProviderCredential> {
+    return prisma.providerCredential.delete({
+      where: {
+        userId_provider: {
+          userId,
+          provider,
+        },
+      },
+    });
+  }
+}
+
+export const credentialsRepository =
+  new CredentialsRepository();
+

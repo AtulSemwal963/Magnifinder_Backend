@@ -1,0 +1,20 @@
+model Lead {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+
+  searchId String @db.ObjectId
+  search   Search @relation(fields: [searchId], references: [id], onDelete: Cascade)
+
+  email       String?
+  firstName   String?
+  lastName    String?
+  company     String?
+  title       String?
+  website     String?
+  linkedinUrl String?
+  reason      String?
+  externalId  String?
+  qualifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

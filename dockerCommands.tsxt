@@ -1,0 +1,6 @@
+build command->docker build --no-cache -t magnifinder-backend .
+run container->docker run --rm `
+  --name magnifinder-backend `
+  -p 8080:8080 `
+  --env-file .env `
+  magnifinder-backend
