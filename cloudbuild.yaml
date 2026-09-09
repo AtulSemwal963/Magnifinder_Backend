@@ -1,0 +1,40 @@
+substitutions:
+  _SERVICE_NAME: magnifinder-api
+  _REGION: us-central1
+  _REPOSITORY: magnifinder
+  _FRONTEND_URL: https://REPLACE_WITH_FRONTEND_URL
+  _ALLOWED_ORIGINS: https://REPLACE_WITH_FRONTEND_URL
+  _GOOGLE_OAUTH_REDIRECT_URI: https://REPLACE_WITH_BACKEND_URL/api/v1/identity/google/callback
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$COMMIT_SHA
+      - .
+
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$COMMIT_SHA
+
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE_NAME}
+      - --image=${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$COMMIT_SHA
+      - --region=${_REGION}
+      - --platform=managed
+      - --port=8080
+      - --allow-unauthenticated
+      - --set-env-vars=NODE_ENV=production,FRONTEND_URL=${_FRONTEND_URL},ALLOWED_ORIGINS=${_ALLOWED_ORIGINS},GOOGLE_OAUTH_REDIRECT_URI=${_GOOGLE_OAUTH_REDIRECT_URI}
+      - --set-secrets=DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,GOOGLE_OAUTH_CLIENT_ID=GOOGLE_OAUTH_CLIENT_ID:latest,GOOGLE_OAUTH_CLIENT_SECRET=GOOGLE_OAUTH_CLIENT_SECRET:latest
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_SERVICE_NAME}:$COMMIT_SHA
+
+options:
+  logging: CLOUD_LOGGING_ONLY
