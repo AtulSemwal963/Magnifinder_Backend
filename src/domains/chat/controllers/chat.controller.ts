@@ -331,7 +331,7 @@ export class ChatController {
    * - product documentation
    * - ICP
    * - LLM credentials
-   * - BetterContact credentials
+   * - application BetterContact credentials
    * - operator email
    * - runtime configuration
    * - campaign ID

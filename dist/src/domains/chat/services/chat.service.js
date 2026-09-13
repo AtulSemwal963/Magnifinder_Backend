@@ -300,13 +300,10 @@ export class ChatService {
             throw new Error("LLM API key is not configured.");
         }
         // --------------------------------------------------------
-        // Resolve BetterContact credentials
+        // Resolve application-level BetterContact credentials
         // --------------------------------------------------------
-        const betterContactCredential = await credentialsService.getDecryptedCredential(userId, "bettercontact");
-        if (!betterContactCredential) {
-            throw new Error("BetterContact credentials are not configured.");
-        }
-        if (!betterContactCredential.apiKey?.trim()) {
+        const betterContactApiKey = process.env.BETTERCONTACT_API_KEY;
+        if (!betterContactApiKey?.trim()) {
             throw new Error("BetterContact API key is not configured.");
         }
         // --------------------------------------------------------
@@ -332,7 +329,7 @@ export class ChatService {
         const credentials = {
             aiModel: llmCredential.modelName.trim(),
             llmApiKey: llmCredential.apiKey,
-            betterContactApiKey: betterContactCredential.apiKey,
+            betterContactApiKey: betterContactApiKey.trim(),
             operatorEmail: user.email.trim(),
         };
         // --------------------------------------------------------

@@ -22,6 +22,7 @@ export class CredentialsService {
     async createCredential(userId, input) {
         this.validateUserId(userId);
         const provider = this.validateProvider(input.provider);
+        this.validateUserManagedProvider(provider);
         const apiKey = this.validateApiKey(input.apiKey);
         const modelName = this.validateOptionalModelName(input.modelName);
         const encryptedApiKey = encrypt(apiKey);
@@ -89,13 +90,16 @@ export class CredentialsService {
     async updateCredential(userId, provider, input) {
         this.validateUserId(userId);
         const currentProvider = this.validateProvider(provider);
+        this.validateUserManagedProvider(currentProvider);
         const updateData = {};
         // ----------------------------------------------------------
         // Provider
         // ----------------------------------------------------------
         if (input.provider !== undefined) {
+            const nextProvider = this.validateProvider(input.provider);
+            this.validateUserManagedProvider(nextProvider);
             updateData.provider =
-                this.validateProvider(input.provider);
+                nextProvider;
         }
         // ----------------------------------------------------------
         // Model name
@@ -227,6 +231,11 @@ export class CredentialsService {
         return provider
             .trim()
             .toLowerCase();
+    }
+    validateUserManagedProvider(provider) {
+        if (provider === "bettercontact") {
+            throw new Error("BetterContact is configured by the application.");
+        }
     }
     validateApiKey(apiKey) {
         if (typeof apiKey !== "string" ||

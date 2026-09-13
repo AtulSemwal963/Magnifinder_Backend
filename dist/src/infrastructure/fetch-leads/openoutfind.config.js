@@ -71,7 +71,7 @@ const getPositiveIntegerEnvironmentVariable = (name, fallback) => {
  * execution and are supplied through FetchLeadsInput.
  *
  * Therefore the Magnifinder application can boot without
- * any OpenOutFind user credentials configured.
+ * any user-provided OpenOutFind credentials configured.
  */
 export const getOpenOutFindConfig = () => {
     const executable = getEnvironmentVariable("OPENOUTFIND_EXECUTABLE", DEFAULTS.executable);

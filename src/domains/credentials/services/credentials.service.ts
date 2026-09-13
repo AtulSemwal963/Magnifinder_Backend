@@ -86,6 +86,10 @@ export class CredentialsService {
       input.provider
     );
 
+    this.validateUserManagedProvider(
+      provider
+    );
+
     const apiKey = this.validateApiKey(
       input.apiKey
     );
@@ -201,6 +205,10 @@ export class CredentialsService {
     const currentProvider =
       this.validateProvider(provider);
 
+    this.validateUserManagedProvider(
+      currentProvider
+    );
+
     const updateData: UpdateCredentialData = {};
 
     // ----------------------------------------------------------
@@ -208,10 +216,17 @@ export class CredentialsService {
     // ----------------------------------------------------------
 
     if (input.provider !== undefined) {
-      updateData.provider =
+      const nextProvider =
         this.validateProvider(
           input.provider
         );
+
+      this.validateUserManagedProvider(
+        nextProvider
+      );
+
+      updateData.provider =
+        nextProvider;
     }
 
     // ----------------------------------------------------------
@@ -440,6 +455,16 @@ export class CredentialsService {
     return provider
       .trim()
       .toLowerCase();
+  }
+
+  private validateUserManagedProvider(
+    provider: string
+  ): void {
+    if (provider === "bettercontact") {
+      throw new Error(
+        "BetterContact is configured by the application."
+      );
+    }
   }
 
   private validateApiKey(

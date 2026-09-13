@@ -215,7 +215,7 @@ router.delete(
  * - ICP description from the chat
  * - LLM model from user credentials
  * - LLM API key from user credentials
- * - BetterContact API key from user credentials
+ * - BetterContact API key from backend environment
  * - operator email from the authenticated user's account
  * - country
  * - legal-notice acceptance
